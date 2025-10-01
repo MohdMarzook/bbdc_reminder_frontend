@@ -3,17 +3,16 @@ import React, { useState } from 'react';
 
 
 
-// A simple spinner component for loading states
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center p-4">
     <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
   </div>
 );
 
-// Main App Component
+
 export default function App() {
-  // State management for the entire application flow
-  const [view, setView] = useState('login'); // Controls which UI to show: 'login', 'details', 'classes'
+  'login', 'details', 'classes', 'success'
+  const [view, setView] = useState('login'); 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [testType, settestType] = useState('practical');
@@ -22,12 +21,13 @@ export default function App() {
   const [classes, setClasses] = useState([1.01, 1.02, 1.03]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [authToken, setAuthToken] = useState("null"); // To store auth token after login
-  const [jsessionid , setJsessionid] = useState(""); // To store jsessionid after login
+  const [authToken, setAuthToken] = useState("null"); 
+  const [jsessionid , setJsessionid] = useState(""); 
   const [email, setEmail] = useState('');
   const [dateTime, setDateTime] = useState('');
+  const [notifyForAllDay, setNotifyForAllDay] = useState(false);
 
-  // Simulates a login API call
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!username || !password) {
@@ -37,9 +37,9 @@ export default function App() {
     setIsLoading(true);
     setError('');
 
-    // Simulate network delay
+    
     try {
-      // Proper fetch request
+      
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login`, {
         method: 'POST',
         headers: {
@@ -48,13 +48,13 @@ export default function App() {
         body: JSON.stringify({ username, password }),
       });
 
-      // Check if the response is ok (status 200-299)
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
         return;
       }
 
-      // Get the response data
+      
       const data = await response.json();
 
       
@@ -79,13 +79,13 @@ export default function App() {
     }
   };
   
-  // Simulates fetching classes based on the selected course type
+  
   const handleFetchClasses = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Simulate network delay
+    
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/fetchClass/${testType}`, {
       method: 'POST',
       headers: {
@@ -103,7 +103,7 @@ export default function App() {
       
       setClasses(data[0] || []);
       setCourseType(data[1] || null);
-      setView('classes'); // Move to the final view
+      setView('classes');
     }
       setIsLoading(false);
   };
@@ -112,6 +112,11 @@ export default function App() {
     e.preventDefault();
     setIsLoading(true);
     try {
+      let finaldatetime = dateTime;
+      if(notifyForAllDay){
+        finaldatetime = dateTime + "T00:00";
+      }
+      console.log("Sending reminder request with:", { username, testType, classSelect, courseType, email, finaldatetime, authToken, jsessionid });
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/setreminder`, {
         method: 'POST', 
         headers: {
@@ -123,7 +128,7 @@ export default function App() {
           classSelect: classSelect, 
           courseType: courseType,
           email: email, 
-          dateTime: dateTime, 
+          dateTime: finaldatetime, 
           authToken: authToken, 
           jsessionid: jsessionid 
         })
@@ -215,7 +220,7 @@ export default function App() {
                  <button onClick={resetToLogin} className="text-sm text-gray-600 hover:text-gray-800 transition">Logout</button>
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">{title} Class</h2>
-            <p>Select the class you want to set a reminder for</p>
+            <b>Select the class you want to set a reminder for</b>
             {classes.length > 0 ? (
               <ul className="space-y-3">
                 <select
@@ -233,12 +238,16 @@ export default function App() {
              
               </ul>
             ) : <p className="text-gray-500">No classes found for this type.</p>}
-            <p>Enter your E-mail ID</p>
+            <b>Enter your E-mail ID</b>
             <input onChange={(e) => setEmail(e.target.value)} className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' type="email" required />
-            <p>Enter the date and time</p>
-            <input onChange={(e) => setDateTime(e.target.value)} min={new Date().toISOString().slice(0, 16)} className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' type="datetime-local" required />
-            <b>Note </b> 
-            <p>set time to 00:00 if you want to get notified if any slot available for that day, <br />For a specific slot set the appropriate start time.</p>
+            <b>Enter the date and time</b>
+            <p><label htmlFor="allDay" className="inline-flex items-center">
+              <input onClick={() => setNotifyForAllDay(!notifyForAllDay)} type="checkbox" defaultChecked={notifyForAllDay} id="allDay" className="mr-2" />
+              All Day
+            </label></p>
+            <input onChange={(e) => setDateTime(e.target.value)} min={new Date().toISOString().slice(0, 16)} className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' type={(notifyForAllDay ? "date" : "datetime-local")} required />
+            <b>Note </b>
+            <p>Check "All Day" if you want to get notified if any slot available for that day, <br />For a specific slot set the appropriate start time.</p>
             {isLoading ? <LoadingSpinner /> : (
                 <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 mt-4">
                   Set Reminder
@@ -255,7 +264,7 @@ export default function App() {
             <h2 className="text-2xl font-bold text-green-600 mb-4">Success!</h2>
             <p className="text-gray-700 mb-6">Your reminder has been set successfully.</p>
             <p>Please check the mail to confirm.</p>
-            <button onClick={resetToLogin} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
+            <button onClick={resetToLogin} className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 mt-5">
               Back to Login
             </button>
           </div>
