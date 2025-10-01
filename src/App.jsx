@@ -70,7 +70,7 @@ export default function App() {
         
 
         setIsLoading(false);
-        setView('details'); // Move to the next view on success
+        setView('details'); 
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -116,7 +116,6 @@ export default function App() {
       if(notifyForAllDay){
         finaldatetime = dateTime + "T00:00";
       }
-      console.log("Sending reminder request with:", { username, testType, classSelect, courseType, email, finaldatetime, authToken, jsessionid });
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/setreminder`, {
         method: 'POST', 
         headers: {
@@ -133,7 +132,7 @@ export default function App() {
           jsessionid: jsessionid 
         })
      });
-    // Get the response data first
+  
       const data = await response.json();
       
       
