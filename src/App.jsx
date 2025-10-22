@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-
-
+import LoginPage from './pages/Login.jsx';
+import DetailsPage from './pages/Details.jsx';
+import ClassesPage from './pages/Classes.jsx';
 
 
 const LoadingSpinner = () => (
@@ -12,6 +13,7 @@ const LoadingSpinner = () => (
 
 export default function App() {
   'login', 'details', 'classes', 'success'
+  let featureCount = 0;
   const [view, setView] = useState('login'); 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -184,85 +186,27 @@ export default function App() {
   const renderView = () => {
     switch (view) {
       case 'details':
-        return (
-          <div className="animate-fade-in">
-            <div className="flex justify-between items-center mb-6">
-                 <h2 className="text-2xl font-bold text-gray-800">Select Course Type</h2>
-                 <button onClick={resetToLogin} className="text-sm text-gray-600 hover:text-gray-800 transition">Logout</button>
-            </div>
-            <p className="text-gray-600 mb-6">Welcome, {username}! Please select a course type to see the class list.</p>
-            <form onSubmit={handleFetchClasses}>
-              <div className="mb-4">
-                <label htmlFor="testType" className="block text-gray-700 font-semibold mb-2">Test Type</label>
-                <select
-                  id="testType"
-                  value={testType}
-                  onChange={(e) => settestType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="theory">Theory</option>
-                  <option value="practical">Practical</option>
-                  <option value="test">Test</option>
-                </select>
-              </div>
-              {isLoading ? <LoadingSpinner /> : (
-                <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
-                  Fetch Classes
-                </button>
-              )}
-            </form>
-          </div>
-        );
+        return <DetailsPage handleFetchClasses={handleFetchClasses} username={username} testType={testType} settestType={settestType} isLoading={isLoading} LoadingSpinner={LoadingSpinner} resetToLogin={resetToLogin} />;
       
       case 'classes':
         const title = testType.charAt(0).toUpperCase() + testType.slice(1);
-        return (
-          <form onSubmit={SendReminderRequest}>
-          <div className="animate-fade-in">
-             <div className="flex justify-between items-center mb-4">
-                <button onClick={backToDetails} className="text-sm text-blue-600 hover:underline">
-                    &larr; Back
-                </button>
-                 <button onClick={resetToLogin} className="text-sm text-gray-600 hover:text-gray-800 transition">Logout</button>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">{title} Class</h2>
-            <b>Select the class you want to set a reminder for</b>
-            {classes.length > 0 ? (
-              <ul className="space-y-3">
-                <select
-                  id="classSelect"
-                  value={classSelect}
-                  onChange={(e) => setClassSelect(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="select">Select a class</option>
-                  {classes.map((cls) => (
-                      <option key={cls} className="font-semibold text-gray-800">{cls}</option>
-                  ))} 
-                </select>
-             
-              </ul>
-            ) : <p className="text-gray-500">No classes found for this type.</p>}
-            <b>Enter your E-mail ID</b>
-            <input onChange={(e) => setEmail(e.target.value)} className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' type="email" required />
-            <b>Enter the date and time</b>
-            <p><label htmlFor="allDay" className="inline-flex items-center">
-              <input onClick={() => setNotifyForAllDay(!notifyForAllDay)} type="checkbox" defaultChecked={notifyForAllDay} id="allDay" className="mr-2" />
-              All Day
-            </label></p>
-            <input onChange={(e) => setDateTime(e.target.value)} min={new Date().toISOString().slice(0, 16)} className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500' type={(notifyForAllDay ? "date" : "datetime-local")} required />
-            <b>Note </b>
-            <p>Check "All Day" if you want to get notified if any slot available for that day, <br />For a specific slot set the appropriate start time.</p>
-            {isLoading ? <LoadingSpinner /> : (
-                <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 mt-4">
-                  Set Reminder
-                </button>
-              )}
-            {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
-          </div>
-          </form>
-        );
+        return <ClassesPage 
+          SendReminderRequest={SendReminderRequest} 
+          classes={classes} 
+          classSelect={classSelect} 
+          setClassSelect={setClassSelect} 
+          isLoading={isLoading} 
+          LoadingSpinner={LoadingSpinner} 
+          resetToLogin={resetToLogin} 
+          backToDetails={backToDetails}         
+          setEmail={setEmail} 
+          setDateTime={setDateTime} 
+          notifyForAllDay={notifyForAllDay} 
+          setNotifyForAllDay={setNotifyForAllDay} 
+          title={title} 
+          error={error}
+          featureCount={featureCount}
+        />;
 
       case 'success':
         return (
@@ -278,42 +222,7 @@ export default function App() {
 
       case 'login':
       default:
-        return (
-          <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Sign In</h2>
-            <form onSubmit={handleLogin}>
-              <div className="mb-4">
-                <label htmlFor="username" className="block text-gray-700 font-semibold mb-2">Username</label>
-                <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., user123"
-                />
-              </div>
-              <div className="mb-6">
-                <label htmlFor="password"className="block text-gray-700 font-semibold mb-2">Password</label>
-                <input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder=""
-                />
-              </div>
-              {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-              {isLoading ? <LoadingSpinner /> : (
-                <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
-                  Login
-                </button>
-              )}
-              
-            </form>
-          </div>
-        );
+        return <LoginPage handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} error={error} isLoading={isLoading} LoadingSpinner={LoadingSpinner} />;
     }
   };
 
