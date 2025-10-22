@@ -162,6 +162,13 @@ export default function App() {
     setView('login');
     setUsername('');
     setPassword('');
+    settestType('');
+    setCourseType('');
+    setClassSelect('');
+    setClasses('');
+    setError('');
+    setAuthToken('Null');
+    setJsessionid('');
     setIsLoading(false);
     setError('');
   };
