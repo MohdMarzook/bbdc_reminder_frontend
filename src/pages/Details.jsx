@@ -39,11 +39,11 @@ export default function DetailsPage({ handleFetchClasses, username, testType, se
             </form>
             <div className="pt-3">
                 <form onSubmit={PrevReminderHandler}>
-                    {isLoading ? <LoadingSpinner /> : (
-                        <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
-                        Previous Reminders
-                        </button>
-                    )}
+                    
+                    <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
+                    Previous Reminders
+                    </button>
+                
                 </form>
               </div>
           </div>
